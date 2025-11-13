@@ -49,7 +49,17 @@ public class loginPage {
         	
         	
         	
-        //2	
+        //check is username and password = admin, show successful message if successful logged in and unsuccessful message if failed to logged in 
+    	if (userType.equals("Admin")) {
+            if (username.equals("admin") && password.equals("admin")) {
+                JOptionPane.showMessageDialog(frame, "Admin Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
+                MainPage.createMainPage(true);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Invalid admin credentials!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            return;
+        }
         	
         	
         	
