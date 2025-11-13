@@ -55,7 +55,7 @@ public class loginPage {
         	
         	
         // Authenticate valid email and pass, show message if invalid and prompt for new entry
-        // show successful login message if valid and redirect to main page.
+        // show successful login message if valid and redirect to main page
         if (!AuthService.isValidEmail(username)) {
               JOptionPane.showMessageDialog(frame, "Invalid email format! Must be xxxx@xxx.xx", "Error", JOptionPane.ERROR_MESSAGE);
               return;
