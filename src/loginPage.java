@@ -43,6 +43,7 @@ public class loginPage {
         	
         	
         //1
+      
         	
         	
         	
@@ -53,8 +54,21 @@ public class loginPage {
         	
         	
         	
-        //3
-        
+        // Authenticate if email and password are valid, show message if invalid
+        // show successful login message if valid and redirect to main page
+        if (!AuthService.isValidEmail(username)) {
+              JOptionPane.showMessageDialog(frame, "Invalid email format! Must be xxxx@xxx.xx", "Error", JOptionPane.ERROR_MESSAGE);
+              return;
+        }
+
+        if (!AuthService.isValidPassword(password)) {
+              JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
+              return;
+        }
+
+        JOptionPane.showMessageDialog(frame, "Customer Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        frame.dispose();
+        MainPage.createMainPage();
         	
         	
         });
