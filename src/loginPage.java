@@ -20,7 +20,7 @@ public class loginPage {
 		loginType.addItem("Admin");
 		panel.add(loginType);
 
-		JLabel userLabel = new JLabel("Username:");
+		JLabel userLabel = new JLabel("Email:");
 		userLabel.setBounds(50, 80, 80, 25);
 		panel.add(userLabel);
 
