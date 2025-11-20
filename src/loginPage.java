@@ -4,6 +4,8 @@ import java.awt.event.ActionListener;
 
 public class loginPage {
     public static void createLoginPage() {
+// 这里的 'static' 表示可以通过类名直接调用
+// 'void' 表示该方法不返回任何值 createLoginPage() {
         JFrame frame = new JFrame("Shoe Inventory Login");
         frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
