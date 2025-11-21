@@ -1,1 +1,10 @@
 /bin/
+
+.vscode/
+
+.settings/
+.classpath
+.project
+
+*.class
+*.log
