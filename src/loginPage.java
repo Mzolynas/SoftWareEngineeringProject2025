@@ -4,8 +4,6 @@ import java.awt.event.ActionListener;
 
 public class loginPage {
     public static void createLoginPage() {
-// 这里的 'static' 表示可以通过类名直接调用
-// 'void' 表示该方法不返回任何值 createLoginPage() {
         JFrame frame = new JFrame("Shoe Inventory Login");
         frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,51 +38,75 @@ public class loginPage {
         passwordField.setBounds(150, 130, 165, 25);
         panel.add(passwordField);
 
+        // NEW: hint label for format requirements
+        JLabel hintLabel = new JLabel("Email: name@example.com  Password: letters & numbers only");
+        hintLabel.setBounds(20, 160, 360, 25);
+        panel.add(hintLabel);
+
         JButton loginButton = new JButton("Login");
-        loginButton.setBounds(150, 180, 80, 25);
+        loginButton.setBounds(150, 200, 80, 25);
         loginButton.addActionListener(e -> {
-            //retrieves the login inputs and shows an error message if the username or password is left empty.
+            // retrieves the login inputs and shows an error message if the username or password is left empty.
             String userType = (String) loginType.getSelectedItem();
             String username = userField.getText().trim();
             String password = new String(passwordField.getPassword());
 
             if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Username and password are required!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        "Username and password are required!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            //check is username and password = admin, show successful message if successful logged in and unsuccessful message if failed to logged in 
+            // Admin login: only admin/admin
             if (userType.equals("Admin")) {
                 if (username.equals("admin") && password.equals("admin")) {
-                    JOptionPane.showMessageDialog(frame, "Admin Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(frame,
+                            "Admin Login Successful!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
                     frame.dispose();
                     MainPage.createMainPage();
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Invalid admin credentials!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame,
+                            "Invalid admin credentials!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
                 return;
             }
 
-            // Authenticate valid email and pass, show message if invalid and prompt for new entry
-            // show successful login message if valid and redirect to main page
+            // Customer login:
+            // 1) email must be normal format
             if (!AuthService.isValidEmail(username)) {
-                JOptionPane.showMessageDialog(frame, "Invalid email format! Must be xxxx@xxx.xx", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        "Invalid email format! Example: name@example.com",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
+            // 2) password only letters and digits
             if (!AuthService.isValidPassword(password)) {
-                JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        "Password must contain only letters and numbers.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            JOptionPane.showMessageDialog(frame, "Customer Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame,
+                    "Customer Login Successful!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
             frame.dispose();
             MainPage.createMainPage();
         });
         panel.add(loginButton);
 
         JButton resetButton = new JButton("Reset Password");
-        resetButton.setBounds(130, 220, 140, 25);  // CHANGED: Made button longer
+        resetButton.setBounds(130, 240, 140, 25);
         resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -140,37 +162,54 @@ public class loginPage {
 
                 // Verify valid email is entered
                 if (!AuthService.isValidEmail(email)) {
-                    JOptionPane.showMessageDialog(resetDialog, "Please enter a valid email address!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(resetDialog,
+                            "Please enter a valid email address!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 // Verify new password is entered
                 if (newPassword.isEmpty()) {
-                    JOptionPane.showMessageDialog(resetDialog, "Please enter a new password!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(resetDialog,
+                            "Please enter a new password!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 // Verify passwords match
                 if (!newPassword.equals(confirmPassword)) {
-                    JOptionPane.showMessageDialog(resetDialog, "Passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(resetDialog,
+                            "Passwords do not match!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify new password is more than 8 characters and contains one special character
+                // Verify new password: letters and digits only
                 if (!AuthService.isValidPassword(newPassword)) {
-                    JOptionPane.showMessageDialog(resetDialog, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(resetDialog,
+                            "Password must contain only letters and numbers.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify valid email is sent (simulated)
+                // Simulate email sending
                 boolean emailSent = simulateEmailSending(email);
                 if (!emailSent) {
-                    JOptionPane.showMessageDialog(resetDialog, "Failed to send reset email. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(resetDialog,
+                            "Failed to send reset email. Please try again.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify success message is displayed after successful attempt
-                JOptionPane.showMessageDialog(resetDialog, "Password reset successful! Check your email for confirmation.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(resetDialog,
+                        "Password reset successful! Check your email for confirmation.",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
                 resetDialog.dispose();
             }
         });
