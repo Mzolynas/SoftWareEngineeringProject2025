@@ -182,7 +182,6 @@ public class MainPage {
         JButton deleteBtn = createStyledButton("Delete Shoe", new Color(0, 51, 102));
         JButton viewDetailsBtn = createStyledButton("View Details", new Color(0, 51, 102));
         JButton statsBtn = createStyledButton("Inventory Stats", new Color(0, 51, 102));
-        JButton exportBtn = createStyledButton("Export Data", new Color(0, 51, 102));
         JButton logoutBtn = createStyledButton("Logout", new Color(0, 51, 102));
         
         buttonPanel.add(refreshBtn);
@@ -191,7 +190,6 @@ public class MainPage {
         buttonPanel.add(deleteBtn);
         buttonPanel.add(viewDetailsBtn);
         buttonPanel.add(statsBtn);
-        buttonPanel.add(exportBtn);
         buttonPanel.add(logoutBtn);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -241,7 +239,6 @@ public class MainPage {
         deleteBtn.addActionListener(e -> deleteSelectedShoe());
         viewDetailsBtn.addActionListener(e -> showShoeDetails());
         statsBtn.addActionListener(e -> showInventoryStatistics());
-        exportBtn.addActionListener(e -> exportData());
         logoutBtn.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(frame, 
                 "Are you sure you want to logout?", 
@@ -434,7 +431,7 @@ public class MainPage {
         }
     }
 
-    // FIXED ADD SHOE DIALOG
+    // ADD SHOE DIALOG
     private static void showAddShoeDialog() {
         JDialog addDialog = new JDialog(frame, "Add New Shoe", true);
         addDialog.setSize(500, 600);
@@ -564,7 +561,7 @@ public class MainPage {
         addDialog.setVisible(true);
     }
 
-    // FIXED EDIT SHOE DIALOG - No more "Illegal value: -1"
+    // EDIT SHOE DIALOG
     private static void showEditShoeDialog() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -575,47 +572,8 @@ public class MainPage {
             return;
         }
         
-        // FIX: Safe conversion and validation
-        int modelRow;
-        try {
-            modelRow = shoesTable.convertRowIndexToModel(selectedRow);
-        } catch (IndexOutOfBoundsException e) {
-            JOptionPane.showMessageDialog(frame, 
-                "Invalid selection. Please select a valid shoe.", 
-                "Selection Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        // FIX: Validate model row
-        if (modelRow < 0 || modelRow >= tableModel.getRowCount()) {
-            JOptionPane.showMessageDialog(frame, 
-                "Invalid selection. Please select a valid shoe.", 
-                "Selection Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        // FIX: Safe data retrieval
-        Object idValue = tableModel.getValueAt(modelRow, 0);
-        if (idValue == null) {
-            JOptionPane.showMessageDialog(frame, 
-                "Error: Could not get shoe ID", 
-                "Data Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        int shoeId;
-        try {
-            shoeId = Integer.parseInt(idValue.toString());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(frame, 
-                "Error: Invalid shoe ID format", 
-                "Data Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
+        int shoeId = Integer.parseInt(tableModel.getValueAt(modelRow, 0).toString());
         
         // Fetch current shoe data
         shoes currentShoe = EnhancedShoeDataBase.getShoeById(shoeId);
@@ -760,7 +718,7 @@ public class MainPage {
         editDialog.setVisible(true);
     }
 
-    // FIXED DELETE SHOE METHOD - No more "Illegal value: -1"
+    // DELETE SHOE METHOD
     private static void deleteSelectedShoe() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -771,53 +729,10 @@ public class MainPage {
             return;
         }
         
-        // FIX: Safe conversion and validation
-        int modelRow;
-        try {
-            modelRow = shoesTable.convertRowIndexToModel(selectedRow);
-        } catch (IndexOutOfBoundsException e) {
-            JOptionPane.showMessageDialog(frame, 
-                "Invalid selection. Please select a valid shoe.", 
-                "Selection Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        // FIX: Validate model row
-        if (modelRow < 0 || modelRow >= tableModel.getRowCount()) {
-            JOptionPane.showMessageDialog(frame, 
-                "Invalid selection. Please select a valid shoe.", 
-                "Selection Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        // FIX: Safe data retrieval
-        Object idValue = tableModel.getValueAt(modelRow, 0);
-        Object nameValue = tableModel.getValueAt(modelRow, 1);
-        Object brandValue = tableModel.getValueAt(modelRow, 2);
-        
-        if (idValue == null || nameValue == null || brandValue == null) {
-            JOptionPane.showMessageDialog(frame, 
-                "Error: Could not get shoe data", 
-                "Data Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        int shoeId;
-        try {
-            shoeId = Integer.parseInt(idValue.toString());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(frame, 
-                "Error: Invalid shoe ID format", 
-                "Data Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        String shoeName = nameValue.toString();
-        String shoeBrand = brandValue.toString();
+        int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
+        int shoeId = Integer.parseInt(tableModel.getValueAt(modelRow, 0).toString());
+        String shoeName = tableModel.getValueAt(modelRow, 1).toString();
+        String shoeBrand = tableModel.getValueAt(modelRow, 2).toString();
         
         int confirm = JOptionPane.showConfirmDialog(frame, 
             "Are you sure you want to delete:\n" +
@@ -834,7 +749,7 @@ public class MainPage {
                     "Shoe deleted successfully!", 
                     "Success", 
                     JOptionPane.INFORMATION_MESSAGE);
-                loadShoesIntoTable(); // Refresh the table
+                loadShoesIntoTable();
             } else {
                 JOptionPane.showMessageDialog(frame, 
                     "Failed to delete shoe. Please try again.", 
@@ -844,7 +759,6 @@ public class MainPage {
         }
     }
 
-    // FIXED SHOW SHOE DETAILS - No more "Illegal value: -1"
     private static void showShoeDetails() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -855,27 +769,7 @@ public class MainPage {
             return;
         }
         
-        // FIX: Safe conversion and validation
-        int modelRow;
-        try {
-            modelRow = shoesTable.convertRowIndexToModel(selectedRow);
-        } catch (IndexOutOfBoundsException e) {
-            JOptionPane.showMessageDialog(frame, 
-                "Invalid selection. Please select a valid shoe.", 
-                "Selection Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        // FIX: Validate model row
-        if (modelRow < 0 || modelRow >= tableModel.getRowCount()) {
-            JOptionPane.showMessageDialog(frame, 
-                "Invalid selection. Please select a valid shoe.", 
-                "Selection Error", 
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
+        int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
         StringBuilder details = new StringBuilder();
         details.append("=== SHOE DETAILS ===\n\n");
         
@@ -950,23 +844,5 @@ public class MainPage {
         JOptionPane.showMessageDialog(frame, scrollPane, 
             "Inventory Statistics", 
             JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-    private static void exportData() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Export Inventory Data");
-        fileChooser.setSelectedFile(new java.io.File("shoe_inventory_export.csv"));
-        
-        if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            java.io.File file = fileChooser.getSelectedFile();
-            JOptionPane.showMessageDialog(frame, 
-                "Data would be exported to: " + file.getAbsolutePath() + "\n\n" +
-                "Export would include:\n" +
-                "- All shoe data in CSV format\n" +
-                "- Current filters and sorting\n" +
-                "- Inventory statistics summary",
-                "Export Simulation",
-                JOptionPane.INFORMATION_MESSAGE);
-        }
     }
 }
