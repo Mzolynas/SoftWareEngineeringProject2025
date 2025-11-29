@@ -184,14 +184,16 @@ public class MainPage {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         
-        JButton refreshBtn = createStyledButton("Refresh", new Color(70, 130, 180));
-        JButton addBtn = createStyledButton("Add Shoe", new Color(34, 139, 34));
-        JButton editBtn = createStyledButton("Edit Shoe", new Color(255, 140, 0));
-        JButton deleteBtn = createStyledButton("Delete Shoe", new Color(178, 34, 34));
-        JButton viewDetailsBtn = createStyledButton("View Details", new Color(75, 0, 130));
-        JButton statsBtn = createStyledButton("Inventory Stats", new Color(47, 79, 79));
-        JButton exportBtn = createStyledButton("Export Data", new Color(139, 0, 139));
-        JButton logoutBtn = createStyledButton("Logout", new Color(105, 105, 105));
+        Color buttonColor = new Color(70, 130, 180); // pick any color you like
+
+        JButton refreshBtn = createStyledButton("Refresh", buttonColor);
+        JButton addBtn = createStyledButton("Add Shoe", buttonColor);
+        JButton editBtn = createStyledButton("Edit Shoe", buttonColor);
+        JButton deleteBtn = createStyledButton("Delete Shoe", buttonColor);
+        JButton viewDetailsBtn = createStyledButton("View Details", buttonColor);
+        JButton statsBtn = createStyledButton("Inventory Stats", buttonColor);
+        JButton logoutBtn = createStyledButton("Logout", buttonColor);
+
         
         buttonPanel.add(refreshBtn);
         buttonPanel.add(addBtn);
@@ -199,7 +201,6 @@ public class MainPage {
         buttonPanel.add(deleteBtn);
         buttonPanel.add(viewDetailsBtn);
         buttonPanel.add(statsBtn);
-        buttonPanel.add(exportBtn);
         buttonPanel.add(logoutBtn);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -249,7 +250,6 @@ public class MainPage {
         deleteBtn.addActionListener(e -> deleteSelectedShoe());
         viewDetailsBtn.addActionListener(e -> showShoeDetails());
         statsBtn.addActionListener(e -> showInventoryStatistics());
-        exportBtn.addActionListener(e -> exportData());
         logoutBtn.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(frame, 
                 "Are you sure you want to logout?", 
@@ -853,23 +853,5 @@ public class MainPage {
         JOptionPane.showMessageDialog(frame, scrollPane, 
             "Inventory Statistics", 
             JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-    private static void exportData() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Export Inventory Data");
-        fileChooser.setSelectedFile(new java.io.File("shoe_inventory_export.csv"));
-        
-        if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            java.io.File file = fileChooser.getSelectedFile();
-            JOptionPane.showMessageDialog(frame, 
-                "Data would be exported to: " + file.getAbsolutePath() + "\n\n" +
-                "Export would include:\n" +
-                "- All shoe data in CSV format\n" +
-                "- Current filters and sorting\n" +
-                "- Inventory statistics summary",
-                "Export Simulation",
-                JOptionPane.INFORMATION_MESSAGE);
-        }
     }
 }
