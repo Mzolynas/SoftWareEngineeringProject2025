@@ -11,7 +11,7 @@ public class App {
         
         // Initialize database
         SwingUtilities.invokeLater(() -> {
-            shoeDataBase.initializeDatabase();
+        	EnhancedShoeDataBase.initializeDatabase();
             
             // Start the login page
             loginPage.createLoginPage();

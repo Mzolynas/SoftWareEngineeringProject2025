@@ -56,15 +56,11 @@ public class MainPage {
 
         gbc.gridx = 2; gbc.gridy = 0;
         gbc.weightx = 0.0;
-        JButton searchButton = new JButton("Search");
-        searchButton.setBackground(new Color(70, 130, 180));
-        searchButton.setForeground(Color.WHITE);
+        JButton searchButton = createStyledButton("Search", new Color(0, 51, 102));
         filterPanel.add(searchButton, gbc);
 
         gbc.gridx = 3; gbc.gridy = 0;
-        JButton clearSearchButton = new JButton("Clear");
-        clearSearchButton.setBackground(new Color(169, 169, 169));
-        clearSearchButton.setForeground(Color.WHITE);
+        JButton clearSearchButton = createStyledButton("Clear", new Color(0, 51, 102));
         filterPanel.add(clearSearchButton, gbc);
 
         // Filter row
@@ -74,7 +70,7 @@ public class MainPage {
         gbc.gridx = 1; gbc.gridy = 1;
         JComboBox<String> brandFilter = new JComboBox<>();
         brandFilter.addItem("All Brands");
-        List<String> brands = shoeDataBase.getAllBrands();
+        List<String> brands = EnhancedShoeDataBase.getAllBrands();
         for (String brand : brands) {
             brandFilter.addItem(brand);
         }
@@ -86,16 +82,14 @@ public class MainPage {
         gbc.gridx = 3; gbc.gridy = 1;
         JComboBox<String> categoryFilter = new JComboBox<>();
         categoryFilter.addItem("All Categories");
-        List<String> categories = shoeDataBase.getAllCategories();
+        List<String> categories = EnhancedShoeDataBase.getAllCategories();
         for (String category : categories) {
             categoryFilter.addItem(category);
         }
         filterPanel.add(categoryFilter, gbc);
 
         gbc.gridx = 4; gbc.gridy = 1;
-        JButton filterButton = new JButton("Apply Filters");
-        filterButton.setBackground(new Color(70, 130, 180));
-        filterButton.setForeground(Color.WHITE);
+        JButton filterButton = createStyledButton("Apply Filters", new Color(0, 51, 102));
         filterPanel.add(filterButton, gbc);
 
         // Price filter row
@@ -118,9 +112,7 @@ public class MainPage {
         filterPanel.add(sortFilter, gbc);
 
         gbc.gridx = 4; gbc.gridy = 2;
-        JButton resetAllButton = new JButton("Reset All");
-        resetAllButton.setBackground(new Color(169, 169, 169));
-        resetAllButton.setForeground(Color.WHITE);
+        JButton resetAllButton = createStyledButton("Reset All", new Color(0, 51, 102));
         filterPanel.add(resetAllButton, gbc);
 
         mainPanel.add(filterPanel, BorderLayout.CENTER);
@@ -180,18 +172,18 @@ public class MainPage {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Shoe Inventory"));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Button panel
+        // Button panel - ALL BUTTONS DARK BLUE
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         
-        JButton refreshBtn = createStyledButton("Refresh", new Color(70, 130, 180));
-        JButton addBtn = createStyledButton("Add Shoe", new Color(34, 139, 34));
-        JButton editBtn = createStyledButton("Edit Shoe", new Color(255, 140, 0));
-        JButton deleteBtn = createStyledButton("Delete Shoe", new Color(178, 34, 34));
-        JButton viewDetailsBtn = createStyledButton("View Details", new Color(75, 0, 130));
-        JButton statsBtn = createStyledButton("Inventory Stats", new Color(47, 79, 79));
-        JButton exportBtn = createStyledButton("Export Data", new Color(139, 0, 139));
-        JButton logoutBtn = createStyledButton("Logout", new Color(105, 105, 105));
+        JButton refreshBtn = createStyledButton("Refresh", new Color(0, 51, 102));
+        JButton addBtn = createStyledButton("Add Shoe", new Color(0, 51, 102));
+        JButton editBtn = createStyledButton("Edit Shoe", new Color(0, 51, 102));
+        JButton deleteBtn = createStyledButton("Delete Shoe", new Color(0, 51, 102));
+        JButton viewDetailsBtn = createStyledButton("View Details", new Color(0, 51, 102));
+        JButton statsBtn = createStyledButton("Inventory Stats", new Color(0, 51, 102));
+        JButton exportBtn = createStyledButton("Export Data", new Color(0, 51, 102));
+        JButton logoutBtn = createStyledButton("Logout", new Color(0, 51, 102));
         
         buttonPanel.add(refreshBtn);
         buttonPanel.add(addBtn);
@@ -277,19 +269,31 @@ public class MainPage {
     
     private static JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
-        button.setBackground(bgColor);
+        button.setBackground(new Color(0, 51, 102)); // Dark blue
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(bgColor.darker()),
+            BorderFactory.createLineBorder(new Color(0, 31, 63)), // Darker blue border
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
+        button.setFont(new Font("Arial", Font.BOLD, 12));
+        
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(0, 71, 143)); // Lighter blue on hover
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(0, 51, 102)); // Back to dark blue
+            }
+        });
+        
         return button;
     }
     
     private static void loadShoesIntoTable() {
         tableModel.setRowCount(0);
-        List<shoes> shoesList = shoeDataBase.getAllShoes();
+        List<shoes> shoesList = EnhancedShoeDataBase.getAllShoes();
         
         for (shoes shoe : shoesList) {
             tableModel.addRow(shoe.toTableRow());
@@ -340,7 +344,7 @@ public class MainPage {
     
     private static void searchShoes(String keyword) {
         tableModel.setRowCount(0);
-        List<shoes> shoesList = shoeDataBase.searchShoes(keyword);
+        List<shoes> shoesList = EnhancedShoeDataBase.searchShoes(keyword);
         
         for (shoes shoe : shoesList) {
             tableModel.addRow(shoe.toTableRow());
@@ -363,7 +367,7 @@ public class MainPage {
     
     private static void applyFilters(String brand, String category, String priceRange) {
         tableModel.setRowCount(0);
-        List<shoes> allShoes = shoeDataBase.getAllShoes();
+        List<shoes> allShoes = EnhancedShoeDataBase.getAllShoes();
         
         for (shoes shoe : allShoes) {
             boolean matches = true;
@@ -430,7 +434,7 @@ public class MainPage {
         }
     }
 
-    // WORKING ADD SHOE DIALOG
+    // FIXED ADD SHOE DIALOG
     private static void showAddShoeDialog() {
         JDialog addDialog = new JDialog(frame, "Add New Shoe", true);
         addDialog.setSize(500, 600);
@@ -493,14 +497,9 @@ public class MainPage {
         JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
         addDialog.add(descriptionScroll);
         
-        // Buttons
-        JButton saveButton = new JButton("Save Shoe");
-        saveButton.setBackground(new Color(34, 139, 34));
-        saveButton.setForeground(Color.WHITE);
-        
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.setBackground(new Color(178, 34, 34));
-        cancelButton.setForeground(Color.WHITE);
+        // Buttons - DARK BLUE
+        JButton saveButton = createStyledButton("Save Shoe", new Color(0, 51, 102));
+        JButton cancelButton = createStyledButton("Cancel", new Color(0, 51, 102));
         
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(saveButton);
@@ -536,7 +535,7 @@ public class MainPage {
                 );
                 
                 // Save to database
-                boolean success = shoeDataBase.addShoe(newShoe);
+                boolean success = EnhancedShoeDataBase.addShoe(newShoe);
                 
                 if (success) {
                     JOptionPane.showMessageDialog(addDialog, 
@@ -565,7 +564,7 @@ public class MainPage {
         addDialog.setVisible(true);
     }
 
-    // WORKING EDIT SHOE DIALOG
+    // FIXED EDIT SHOE DIALOG - No more "Illegal value: -1"
     private static void showEditShoeDialog() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -576,11 +575,50 @@ public class MainPage {
             return;
         }
         
-        int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
-        int shoeId = Integer.parseInt(tableModel.getValueAt(modelRow, 0).toString());
+        // FIX: Safe conversion and validation
+        int modelRow;
+        try {
+            modelRow = shoesTable.convertRowIndexToModel(selectedRow);
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(frame, 
+                "Invalid selection. Please select a valid shoe.", 
+                "Selection Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // FIX: Validate model row
+        if (modelRow < 0 || modelRow >= tableModel.getRowCount()) {
+            JOptionPane.showMessageDialog(frame, 
+                "Invalid selection. Please select a valid shoe.", 
+                "Selection Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // FIX: Safe data retrieval
+        Object idValue = tableModel.getValueAt(modelRow, 0);
+        if (idValue == null) {
+            JOptionPane.showMessageDialog(frame, 
+                "Error: Could not get shoe ID", 
+                "Data Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        int shoeId;
+        try {
+            shoeId = Integer.parseInt(idValue.toString());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, 
+                "Error: Invalid shoe ID format", 
+                "Data Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         
         // Fetch current shoe data
-        shoes currentShoe = shoeDataBase.getShoeById(shoeId);
+        shoes currentShoe = EnhancedShoeDataBase.getShoeById(shoeId);
         if (currentShoe == null) {
             JOptionPane.showMessageDialog(frame, 
                 "Error loading shoe data!", 
@@ -653,14 +691,9 @@ public class MainPage {
         JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
         editDialog.add(descriptionScroll);
         
-        // Buttons
-        JButton saveButton = new JButton("Update Shoe");
-        saveButton.setBackground(new Color(255, 140, 0));
-        saveButton.setForeground(Color.WHITE);
-        
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.setBackground(new Color(178, 34, 34));
-        cancelButton.setForeground(Color.WHITE);
+        // Buttons - DARK BLUE
+        JButton saveButton = createStyledButton("Update Shoe", new Color(0, 51, 102));
+        JButton cancelButton = createStyledButton("Cancel", new Color(0, 51, 102));
         
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(saveButton);
@@ -698,7 +731,7 @@ public class MainPage {
                 );
                 
                 // Update in database
-                boolean success = shoeDataBase.updateShoe(updatedShoe);
+                boolean success = EnhancedShoeDataBase.updateShoe(updatedShoe);
                 
                 if (success) {
                     JOptionPane.showMessageDialog(editDialog, 
@@ -727,7 +760,7 @@ public class MainPage {
         editDialog.setVisible(true);
     }
 
-    // WORKING DELETE SHOE METHOD
+    // FIXED DELETE SHOE METHOD - No more "Illegal value: -1"
     private static void deleteSelectedShoe() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -738,10 +771,53 @@ public class MainPage {
             return;
         }
         
-        int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
-        int shoeId = Integer.parseInt(tableModel.getValueAt(modelRow, 0).toString());
-        String shoeName = tableModel.getValueAt(modelRow, 1).toString();
-        String shoeBrand = tableModel.getValueAt(modelRow, 2).toString();
+        // FIX: Safe conversion and validation
+        int modelRow;
+        try {
+            modelRow = shoesTable.convertRowIndexToModel(selectedRow);
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(frame, 
+                "Invalid selection. Please select a valid shoe.", 
+                "Selection Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // FIX: Validate model row
+        if (modelRow < 0 || modelRow >= tableModel.getRowCount()) {
+            JOptionPane.showMessageDialog(frame, 
+                "Invalid selection. Please select a valid shoe.", 
+                "Selection Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // FIX: Safe data retrieval
+        Object idValue = tableModel.getValueAt(modelRow, 0);
+        Object nameValue = tableModel.getValueAt(modelRow, 1);
+        Object brandValue = tableModel.getValueAt(modelRow, 2);
+        
+        if (idValue == null || nameValue == null || brandValue == null) {
+            JOptionPane.showMessageDialog(frame, 
+                "Error: Could not get shoe data", 
+                "Data Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        int shoeId;
+        try {
+            shoeId = Integer.parseInt(idValue.toString());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, 
+                "Error: Invalid shoe ID format", 
+                "Data Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String shoeName = nameValue.toString();
+        String shoeBrand = brandValue.toString();
         
         int confirm = JOptionPane.showConfirmDialog(frame, 
             "Are you sure you want to delete:\n" +
@@ -752,7 +828,7 @@ public class MainPage {
             JOptionPane.WARNING_MESSAGE);
             
         if (confirm == JOptionPane.YES_OPTION) {
-            boolean success = shoeDataBase.deleteShoe(shoeId);
+            boolean success = EnhancedShoeDataBase.deleteShoe(shoeId);
             if (success) {
                 JOptionPane.showMessageDialog(frame, 
                     "Shoe deleted successfully!", 
@@ -768,6 +844,7 @@ public class MainPage {
         }
     }
 
+    // FIXED SHOW SHOE DETAILS - No more "Illegal value: -1"
     private static void showShoeDetails() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -778,7 +855,27 @@ public class MainPage {
             return;
         }
         
-        int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
+        // FIX: Safe conversion and validation
+        int modelRow;
+        try {
+            modelRow = shoesTable.convertRowIndexToModel(selectedRow);
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(frame, 
+                "Invalid selection. Please select a valid shoe.", 
+                "Selection Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // FIX: Validate model row
+        if (modelRow < 0 || modelRow >= tableModel.getRowCount()) {
+            JOptionPane.showMessageDialog(frame, 
+                "Invalid selection. Please select a valid shoe.", 
+                "Selection Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         StringBuilder details = new StringBuilder();
         details.append("=== SHOE DETAILS ===\n\n");
         
