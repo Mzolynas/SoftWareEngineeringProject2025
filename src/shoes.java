@@ -10,7 +10,6 @@ public class shoes {
     private String description;
     private String dateAdded;
     
-    // Constructor for existing shoes
     public shoes(int id, String name, String brand, double size, String color, 
                 double price, int quantity, String category, String description, String dateAdded) {
         this.id = id;
@@ -25,7 +24,6 @@ public class shoes {
         this.dateAdded = dateAdded;
     }
     
-    // Constructor for new shoes (without ID)
     public shoes(String name, String brand, double size, String color, 
                 double price, int quantity, String category, String description) {
         this.name = name;
@@ -61,7 +59,14 @@ public class shoes {
             String.format("$%.2f", price), 
             quantity, 
             category,
-            description.length() > 30 ? description.substring(0, 30) + "..." : description
+            description.length() > 30 ? description.substring(0, 30) + "..." : description,
+            dateAdded
         };
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s - %s - Size: %.1f - $%.2f - Qty: %d", 
+            name, brand, size, price, quantity);
     }
 }

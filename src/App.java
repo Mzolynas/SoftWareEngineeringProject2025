@@ -1,9 +1,20 @@
+import javax.swing.*;
+
 public class App {
     public static void main(String[] args) {
-        // Use MySQLDatabase NOT shoeDataBase
-    	shoeDataBase.initializeDatabase();
+        // Set system look and feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
-        // Start the login page
-        loginPage.createLoginPage();
+        // Initialize database
+        SwingUtilities.invokeLater(() -> {
+            shoeDataBase.initializeDatabase();
+            
+            // Start the login page
+            loginPage.createLoginPage();
+        });
     }
 }
