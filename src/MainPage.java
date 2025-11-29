@@ -125,14 +125,13 @@ public class MainPage {
 
         mainPanel.add(filterPanel, BorderLayout.CENTER);
 
-        // Table setup - FIXED: Remove column class definitions to prevent formatting issues
+        // Table setup
         String[] columnNames = {"ID", "Name", "Brand", "Size", "Color", "Price", "Quantity", "Category", "Description", "Date Added"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table non-editable
+                return false;
             }
-            // REMOVED: getColumnClass method to prevent number formatting issues
         };
         
         shoesTable = new JTable(tableModel);
@@ -141,7 +140,7 @@ public class MainPage {
         shoesTable.setAutoCreateRowSorter(true);
         shoesTable.setRowHeight(25);
         
-        // Custom renderer for better appearance - SIMPLIFIED VERSION
+        // Custom renderer for better appearance
         shoesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -289,7 +288,7 @@ public class MainPage {
     }
     
     private static void loadShoesIntoTable() {
-        tableModel.setRowCount(0); // Clear existing rows
+        tableModel.setRowCount(0);
         List<shoes> shoesList = shoeDataBase.getAllShoes();
         
         for (shoes shoe : shoesList) {
@@ -333,11 +332,10 @@ public class MainPage {
         for (int i = 0; i < shoesTable.getColumnCount(); i++) {
             shoesTable.getColumnModel().getColumn(i).setPreferredWidth(120);
         }
-        // Set specific widths for certain columns
-        shoesTable.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
-        shoesTable.getColumnModel().getColumn(1).setPreferredWidth(150); // Name
-        shoesTable.getColumnModel().getColumn(8).setPreferredWidth(200); // Description
-        shoesTable.getColumnModel().getColumn(9).setPreferredWidth(100); // Date Added
+        shoesTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+        shoesTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+        shoesTable.getColumnModel().getColumn(8).setPreferredWidth(200);
+        shoesTable.getColumnModel().getColumn(9).setPreferredWidth(100);
     }
     
     private static void searchShoes(String keyword) {
@@ -370,17 +368,14 @@ public class MainPage {
         for (shoes shoe : allShoes) {
             boolean matches = true;
             
-            // Apply brand filter
             if (!brand.equals("All Brands") && !shoe.getBrand().equals(brand)) {
                 matches = false;
             }
             
-            // Apply category filter
             if (!category.equals("All Categories") && !shoe.getCategory().equals(category)) {
                 matches = false;
             }
             
-            // Apply price filter
             if (!priceRange.equals("All Prices")) {
                 double price = shoe.getPrice();
                 switch (priceRange) {
@@ -415,7 +410,6 @@ public class MainPage {
     }
     
     private static void sortTable(String sortOption) {
-        // Since we removed column type definitions, use simple column index sorting
         switch (sortOption) {
             case "Price: Low to High":
                 shoesTable.getRowSorter().toggleSortOrder(5);
@@ -431,12 +425,12 @@ public class MainPage {
                 shoesTable.getRowSorter().toggleSortOrder(2);
                 break;
             default:
-                // Default sorting (by ID)
                 loadShoesIntoTable();
                 break;
         }
     }
-    
+
+    // WORKING ADD SHOE DIALOG
     private static void showAddShoeDialog() {
         JDialog addDialog = new JDialog(frame, "Add New Shoe", true);
         addDialog.setSize(500, 600);
@@ -445,38 +439,53 @@ public class MainPage {
         addDialog.getContentPane().setBackground(new Color(240, 240, 240));
         
         // Form fields
-        addDialog.add(new JLabel("Name:"));
+        addDialog.add(new JLabel("Name:*"));
         JTextField nameField = new JTextField();
         addDialog.add(nameField);
         
-        addDialog.add(new JLabel("Brand:"));
+        addDialog.add(new JLabel("Brand:*"));
         JComboBox<String> brandCombo = new JComboBox<>();
-        for (String brand : shoeDataBase.getAllBrands()) {
-            brandCombo.addItem(brand);
-        }
+        brandCombo.addItem("Nike");
+        brandCombo.addItem("Adidas");
+        brandCombo.addItem("New Balance");
+        brandCombo.addItem("Puma");
+        brandCombo.addItem("Reebok");
+        brandCombo.addItem("Converse");
+        brandCombo.addItem("Vans");
+        brandCombo.addItem("ASICS");
+        brandCombo.setEditable(true);
         addDialog.add(brandCombo);
         
-        addDialog.add(new JLabel("Size:"));
-        JTextField sizeField = new JTextField();
-        addDialog.add(sizeField);
+        addDialog.add(new JLabel("Size:*"));
+        JComboBox<Double> sizeCombo = new JComboBox<>();
+        for (double size = 6.0; size <= 13.0; size += 0.5) {
+            sizeCombo.addItem(size);
+        }
+        addDialog.add(sizeCombo);
         
-        addDialog.add(new JLabel("Color:"));
+        addDialog.add(new JLabel("Color:*"));
         JTextField colorField = new JTextField();
         addDialog.add(colorField);
         
-        addDialog.add(new JLabel("Price:"));
+        addDialog.add(new JLabel("Price:*"));
         JTextField priceField = new JTextField();
         addDialog.add(priceField);
         
-        addDialog.add(new JLabel("Quantity:"));
-        JTextField quantityField = new JTextField();
-        addDialog.add(quantityField);
+        addDialog.add(new JLabel("Quantity:*"));
+        JSpinner quantitySpinner = new JSpinner(new SpinnerNumberModel(1, 0, 1000, 1));
+        addDialog.add(quantitySpinner);
         
-        addDialog.add(new JLabel("Category:"));
+        addDialog.add(new JLabel("Category:*"));
         JComboBox<String> categoryCombo = new JComboBox<>();
-        for (String category : shoeDataBase.getAllCategories()) {
-            categoryCombo.addItem(category);
-        }
+        categoryCombo.addItem("Running");
+        categoryCombo.addItem("Lifestyle");
+        categoryCombo.addItem("Basketball");
+        categoryCombo.addItem("Skateboarding");
+        categoryCombo.addItem("Training");
+        categoryCombo.addItem("Hiking");
+        categoryCombo.addItem("Luxury");
+        categoryCombo.addItem("Sandals");
+        categoryCombo.setEditable(true);
         addDialog.add(categoryCombo);
         
         addDialog.add(new JLabel("Description:"));
@@ -497,21 +506,66 @@ public class MainPage {
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
         
-        addDialog.add(new JLabel()); // Empty cell
+        addDialog.add(new JLabel());
         addDialog.add(buttonPanel);
         
         saveButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(addDialog, 
-                "Add functionality would be implemented here with database integration",
-                "Feature Note",
-                JOptionPane.INFORMATION_MESSAGE);
+            // Validation
+            if (nameField.getText().trim().isEmpty() ||
+                colorField.getText().trim().isEmpty() ||
+                priceField.getText().trim().isEmpty()) {
+                
+                JOptionPane.showMessageDialog(addDialog, 
+                    "Please fill in all required fields (*)", 
+                    "Validation Error", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            try {
+                // Create new shoe object
+                shoes newShoe = new shoes(
+                    nameField.getText().trim(),
+                    brandCombo.getSelectedItem().toString(),
+                    (Double) sizeCombo.getSelectedItem(),
+                    colorField.getText().trim(),
+                    Double.parseDouble(priceField.getText().trim()),
+                    (Integer) quantitySpinner.getValue(),
+                    categoryCombo.getSelectedItem().toString(),
+                    descriptionArea.getText().trim()
+                );
+                
+                // Save to database
+                boolean success = shoeDataBase.addShoe(newShoe);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(addDialog, 
+                        "Shoe added successfully!", 
+                        "Success", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    addDialog.dispose();
+                    loadShoesIntoTable();
+                } else {
+                    JOptionPane.showMessageDialog(addDialog, 
+                        "Failed to add shoe. Please try again.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(addDialog, 
+                    "Please enter a valid price!", 
+                    "Validation Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
         });
         
         cancelButton.addActionListener(e -> addDialog.dispose());
         
         addDialog.setVisible(true);
     }
-    
+
+    // WORKING EDIT SHOE DIALOG
     private static void showEditShoeDialog() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -523,23 +577,157 @@ public class MainPage {
         }
         
         int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
-        Object idObj = tableModel.getValueAt(modelRow, 0);
-        Object nameObj = tableModel.getValueAt(modelRow, 1);
+        int shoeId = Integer.parseInt(tableModel.getValueAt(modelRow, 0).toString());
         
-        String shoeId = idObj != null ? idObj.toString() : "Unknown";
-        String shoeName = nameObj != null ? nameObj.toString() : "Unknown";
+        // Fetch current shoe data
+        shoes currentShoe = shoeDataBase.getShoeById(shoeId);
+        if (currentShoe == null) {
+            JOptionPane.showMessageDialog(frame, 
+                "Error loading shoe data!", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         
-        JOptionPane.showMessageDialog(frame, 
-            "Would edit shoe: " + shoeName + " (ID: " + shoeId + ")\n\n" +
-            "Edit functionality would include:\n" +
-            "- Update shoe information\n" +
-            "- Modify price and quantity\n" +
-            "- Change description\n" +
-            "- Save changes to database",
-            "Edit Shoe - " + shoeName,
-            JOptionPane.INFORMATION_MESSAGE);
+        JDialog editDialog = new JDialog(frame, "Edit Shoe - " + currentShoe.getName(), true);
+        editDialog.setSize(500, 600);
+        editDialog.setLocationRelativeTo(frame);
+        editDialog.setLayout(new GridLayout(0, 2, 10, 10));
+        editDialog.getContentPane().setBackground(new Color(240, 240, 240));
+        
+        // Form fields with current values
+        editDialog.add(new JLabel("Name:*"));
+        JTextField nameField = new JTextField(currentShoe.getName());
+        editDialog.add(nameField);
+        
+        editDialog.add(new JLabel("Brand:*"));
+        JComboBox<String> brandCombo = new JComboBox<>();
+        brandCombo.addItem("Nike");
+        brandCombo.addItem("Adidas");
+        brandCombo.addItem("New Balance");
+        brandCombo.addItem("Puma");
+        brandCombo.addItem("Reebok");
+        brandCombo.addItem("Converse");
+        brandCombo.addItem("Vans");
+        brandCombo.addItem("ASICS");
+        brandCombo.setEditable(true);
+        brandCombo.setSelectedItem(currentShoe.getBrand());
+        editDialog.add(brandCombo);
+        
+        editDialog.add(new JLabel("Size:*"));
+        JComboBox<Double> sizeCombo = new JComboBox<>();
+        for (double size = 6.0; size <= 13.0; size += 0.5) {
+            sizeCombo.addItem(size);
+        }
+        sizeCombo.setSelectedItem(currentShoe.getSize());
+        editDialog.add(sizeCombo);
+        
+        editDialog.add(new JLabel("Color:*"));
+        JTextField colorField = new JTextField(currentShoe.getColor());
+        editDialog.add(colorField);
+        
+        editDialog.add(new JLabel("Price:*"));
+        JTextField priceField = new JTextField(String.valueOf(currentShoe.getPrice()));
+        editDialog.add(priceField);
+        
+        editDialog.add(new JLabel("Quantity:*"));
+        JSpinner quantitySpinner = new JSpinner(new SpinnerNumberModel(currentShoe.getQuantity(), 0, 1000, 1));
+        editDialog.add(quantitySpinner);
+        
+        editDialog.add(new JLabel("Category:*"));
+        JComboBox<String> categoryCombo = new JComboBox<>();
+        categoryCombo.addItem("Running");
+        categoryCombo.addItem("Lifestyle");
+        categoryCombo.addItem("Basketball");
+        categoryCombo.addItem("Skateboarding");
+        categoryCombo.addItem("Training");
+        categoryCombo.addItem("Hiking");
+        categoryCombo.addItem("Luxury");
+        categoryCombo.addItem("Sandals");
+        categoryCombo.setEditable(true);
+        categoryCombo.setSelectedItem(currentShoe.getCategory());
+        editDialog.add(categoryCombo);
+        
+        editDialog.add(new JLabel("Description:"));
+        JTextArea descriptionArea = new JTextArea(currentShoe.getDescription(), 3, 20);
+        JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
+        editDialog.add(descriptionScroll);
+        
+        // Buttons
+        JButton saveButton = new JButton("Update Shoe");
+        saveButton.setBackground(new Color(255, 140, 0));
+        saveButton.setForeground(Color.WHITE);
+        
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.setBackground(new Color(178, 34, 34));
+        cancelButton.setForeground(Color.WHITE);
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
+        
+        editDialog.add(new JLabel());
+        editDialog.add(buttonPanel);
+        
+        saveButton.addActionListener(e -> {
+            // Validation
+            if (nameField.getText().trim().isEmpty() ||
+                colorField.getText().trim().isEmpty() ||
+                priceField.getText().trim().isEmpty()) {
+                
+                JOptionPane.showMessageDialog(editDialog, 
+                    "Please fill in all required fields (*)", 
+                    "Validation Error", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            try {
+                // Create updated shoe object
+                shoes updatedShoe = new shoes(
+                    currentShoe.getId(),
+                    nameField.getText().trim(),
+                    brandCombo.getSelectedItem().toString(),
+                    (Double) sizeCombo.getSelectedItem(),
+                    colorField.getText().trim(),
+                    Double.parseDouble(priceField.getText().trim()),
+                    (Integer) quantitySpinner.getValue(),
+                    categoryCombo.getSelectedItem().toString(),
+                    descriptionArea.getText().trim(),
+                    currentShoe.getDateAdded()
+                );
+                
+                // Update in database
+                boolean success = shoeDataBase.updateShoe(updatedShoe);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(editDialog, 
+                        "Shoe updated successfully!", 
+                        "Success", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    editDialog.dispose();
+                    loadShoesIntoTable();
+                } else {
+                    JOptionPane.showMessageDialog(editDialog, 
+                        "Failed to update shoe. Please try again.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(editDialog, 
+                    "Please enter a valid price!", 
+                    "Validation Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        cancelButton.addActionListener(e -> editDialog.dispose());
+        
+        editDialog.setVisible(true);
     }
-    
+
+    // WORKING DELETE SHOE METHOD
     private static void deleteSelectedShoe() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -551,11 +739,9 @@ public class MainPage {
         }
         
         int modelRow = shoesTable.convertRowIndexToModel(selectedRow);
-        Object nameObj = tableModel.getValueAt(modelRow, 1);
-        Object brandObj = tableModel.getValueAt(modelRow, 2);
-        
-        String shoeName = nameObj != null ? nameObj.toString() : "Unknown";
-        String shoeBrand = brandObj != null ? brandObj.toString() : "Unknown";
+        int shoeId = Integer.parseInt(tableModel.getValueAt(modelRow, 0).toString());
+        String shoeName = tableModel.getValueAt(modelRow, 1).toString();
+        String shoeBrand = tableModel.getValueAt(modelRow, 2).toString();
         
         int confirm = JOptionPane.showConfirmDialog(frame, 
             "Are you sure you want to delete:\n" +
@@ -566,15 +752,22 @@ public class MainPage {
             JOptionPane.WARNING_MESSAGE);
             
         if (confirm == JOptionPane.YES_OPTION) {
-            // Simulate deletion
-            JOptionPane.showMessageDialog(frame, 
-                "Shoe would be deleted from database\n" +
-                "(Database delete functionality would be implemented here)",
-                "Delete Simulation",
-                JOptionPane.INFORMATION_MESSAGE);
+            boolean success = shoeDataBase.deleteShoe(shoeId);
+            if (success) {
+                JOptionPane.showMessageDialog(frame, 
+                    "Shoe deleted successfully!", 
+                    "Success", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                loadShoesIntoTable(); // Refresh the table
+            } else {
+                JOptionPane.showMessageDialog(frame, 
+                    "Failed to delete shoe. Please try again.", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
-    
+
     private static void showShoeDetails() {
         int selectedRow = shoesTable.getSelectedRow();
         if (selectedRow == -1) {

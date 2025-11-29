@@ -210,6 +210,8 @@ public class shoeDataBase {
         return categories;
     }
     
+    
+    
     // New method to get inventory statistics
     public static void showInventoryStats() {
         String sql = "SELECT " +
