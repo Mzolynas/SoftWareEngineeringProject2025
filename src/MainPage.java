@@ -74,7 +74,7 @@ public class MainPage {
         gbc.gridx = 1; gbc.gridy = 1;
         JComboBox<String> brandFilter = new JComboBox<>();
         brandFilter.addItem("All Brands");
-        List<String> brands = shoeDataBase.getAllBrands();
+        List<String> brands = EnhancedShoeDataBase.getAllBrands();
         for (String brand : brands) {
             brandFilter.addItem(brand);
         }
@@ -86,7 +86,7 @@ public class MainPage {
         gbc.gridx = 3; gbc.gridy = 1;
         JComboBox<String> categoryFilter = new JComboBox<>();
         categoryFilter.addItem("All Categories");
-        List<String> categories = shoeDataBase.getAllCategories();
+        List<String> categories = EnhancedShoeDataBase.getAllCategories();
         for (String category : categories) {
             categoryFilter.addItem(category);
         }
@@ -289,7 +289,7 @@ public class MainPage {
     
     private static void loadShoesIntoTable() {
         tableModel.setRowCount(0);
-        List<shoes> shoesList = shoeDataBase.getAllShoes();
+        List<shoes> shoesList = EnhancedShoeDataBase.getAllShoes();
         
         for (shoes shoe : shoesList) {
             tableModel.addRow(shoe.toTableRow());
@@ -340,7 +340,7 @@ public class MainPage {
     
     private static void searchShoes(String keyword) {
         tableModel.setRowCount(0);
-        List<shoes> shoesList = shoeDataBase.searchShoes(keyword);
+        List<shoes> shoesList = EnhancedShoeDataBase.searchShoes(keyword);
         
         for (shoes shoe : shoesList) {
             tableModel.addRow(shoe.toTableRow());
@@ -363,7 +363,7 @@ public class MainPage {
     
     private static void applyFilters(String brand, String category, String priceRange) {
         tableModel.setRowCount(0);
-        List<shoes> allShoes = shoeDataBase.getAllShoes();
+        List<shoes> allShoes = EnhancedShoeDataBase.getAllShoes();
         
         for (shoes shoe : allShoes) {
             boolean matches = true;
@@ -536,7 +536,7 @@ public class MainPage {
                 );
                 
                 // Save to database
-                boolean success = shoeDataBase.addShoe(newShoe);
+                boolean success = EnhancedShoeDataBase.addShoe(newShoe);
                 
                 if (success) {
                     JOptionPane.showMessageDialog(addDialog, 
@@ -580,7 +580,7 @@ public class MainPage {
         int shoeId = Integer.parseInt(tableModel.getValueAt(modelRow, 0).toString());
         
         // Fetch current shoe data
-        shoes currentShoe = shoeDataBase.getShoeById(shoeId);
+        shoes currentShoe = EnhancedShoeDataBase.getShoeById(shoeId);
         if (currentShoe == null) {
             JOptionPane.showMessageDialog(frame, 
                 "Error loading shoe data!", 
@@ -698,7 +698,7 @@ public class MainPage {
                 );
                 
                 // Update in database
-                boolean success = shoeDataBase.updateShoe(updatedShoe);
+                boolean success = EnhancedShoeDataBase.updateShoe(updatedShoe);
                 
                 if (success) {
                     JOptionPane.showMessageDialog(editDialog, 
@@ -752,7 +752,7 @@ public class MainPage {
             JOptionPane.WARNING_MESSAGE);
             
         if (confirm == JOptionPane.YES_OPTION) {
-            boolean success = shoeDataBase.deleteShoe(shoeId);
+            boolean success = EnhancedShoeDataBase.deleteShoe(shoeId);
             if (success) {
                 JOptionPane.showMessageDialog(frame, 
                     "Shoe deleted successfully!", 
