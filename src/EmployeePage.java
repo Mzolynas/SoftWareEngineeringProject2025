@@ -119,8 +119,17 @@ public class EmployeePage {
         // --- TABLE (UNCHANGED) ---
         String[] columnNames = {"ID", "Name", "Brand", "Size", "Color", "Price", "Quantity", "Category", "Description", "Date Added"};
         tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // EMPLOYEE CANNOT EDIT
+                return false;
+            }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {  // ID column
+                    return Integer.class;
+                }
+                return Object.class;
             }
         };
 

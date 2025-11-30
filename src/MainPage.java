@@ -132,6 +132,14 @@ public class MainPage {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {  // ID column
+                    return Integer.class;
+                }
+                return Object.class;
+            }
         };
         
         shoesTable = new JTable(tableModel);
