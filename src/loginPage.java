@@ -1,10 +1,13 @@
 import javax.swing.*;
+
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class loginPage {
     public static void createLoginPage() {
-        JFrame frame = new JFrame("Shoe Inventory Login");
+        JFrame frame = new JFrame("Shoe Inventory System - Employee Login");
         frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -18,7 +21,7 @@ public class loginPage {
 
         JComboBox<String> loginType = new JComboBox<>();
         loginType.setBounds(150, 30, 165, 25);
-        loginType.addItem("Customer");
+        loginType.addItem("Employee");
         loginType.addItem("Admin");
         panel.add(loginType);
 
@@ -41,17 +44,17 @@ public class loginPage {
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(150, 180, 80, 25);
         loginButton.addActionListener(e -> {
-            //retrieves the login inputs and shows an error message if the username or password is left empty.
+            // Retrieve login inputs and validate required fields
             String userType = (String) loginType.getSelectedItem();
             String username = userField.getText().trim();
             String password = new String(passwordField.getPassword());
 
             if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Username and password are required!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Email and password are required!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            //check is username and password = admin, show successful message if successful logged in and unsuccessful message if failed to logged in 
+            // Admin authentication
             if (userType.equals("Admin")) {
                 if (username.equals("admin") && password.equals("admin")) {
                     JOptionPane.showMessageDialog(frame, "Admin Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -62,27 +65,29 @@ public class loginPage {
                 }
                 return;
             }
+            // Employee authentication with enhanced validation
+            else if (userType.equals("Employee")) {
+                if (!AuthService.isValidEmail(username)) {
+                    JOptionPane.showMessageDialog(frame, "Invalid email format! Must be in format: name@company.com", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-            // Authenticate valid email and pass, show message if invalid and prompt for new entry
-            // show successful login message if valid and redirect to main page
-            if (!AuthService.isValidEmail(username)) {
-                JOptionPane.showMessageDialog(frame, "Invalid email format! Must be xxxx@xxx.xx", "Error", JOptionPane.ERROR_MESSAGE);
+                if (!AuthService.isValidPassword(password)) {
+                    JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Enhanced employee login success message
+                JOptionPane.showMessageDialog(frame, "Employee Login Successful!\nWelcome to the Inventory System", "Success", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
+                EmployeePage.createEmployeePage();
                 return;
             }
-
-            if (!AuthService.isValidPassword(password)) {
-                JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            JOptionPane.showMessageDialog(frame, "Customer Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            frame.dispose();
-            MainPage.createMainPage();
         });
         panel.add(loginButton);
 
         JButton resetButton = new JButton("Reset Password");
-        resetButton.setBounds(130, 220, 140, 25);  // CHANGED: Made button longer
+        resetButton.setBounds(130, 220, 140, 25);
         resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -91,13 +96,19 @@ public class loginPage {
         });
         panel.add(resetButton);
 
+        // Add help text for employees
+        JLabel helpLabel = new JLabel("<html>Employee: Use company email & secure password<br>Admin: Use default credentials</html>");
+        helpLabel.setBounds(50, 260, 300, 50);
+        helpLabel.setForeground(Color.GRAY);
+        helpLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+        panel.add(helpLabel);
+
         frame.setVisible(true);
     }
 
     private static void openResetPasswordDialog() {
-        // Verify "Forgot password" button is pressed
         JDialog resetDialog = new JDialog();
-        resetDialog.setTitle("Reset Password");
+        resetDialog.setTitle("Reset Employee Password");
         resetDialog.setSize(400, 350);
         resetDialog.setLayout(null);
         resetDialog.setModal(true);
@@ -128,7 +139,7 @@ public class loginPage {
         resetDialog.add(confirmPasswordField);
 
         JButton submitButton = new JButton("Reset Password");
-        submitButton.setBounds(130, 220, 140, 25);
+        submitButton.setBounds(100, 190, 120, 25);
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -136,38 +147,32 @@ public class loginPage {
                 String newPassword = new String(newPasswordField.getPassword());
                 String confirmPassword = new String(confirmPasswordField.getPassword());
 
-                // Verify valid email is entered
                 if (!AuthService.isValidEmail(email)) {
-                    JOptionPane.showMessageDialog(resetDialog, "Please enter a valid email address!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(resetDialog, "Please enter a valid company email address!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify new password is entered
                 if (newPassword.isEmpty()) {
                     JOptionPane.showMessageDialog(resetDialog, "Please enter a new password!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify passwords match
                 if (!newPassword.equals(confirmPassword)) {
                     JOptionPane.showMessageDialog(resetDialog, "Passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify new password is more than 8 characters and contains one special character
                 if (!AuthService.isValidPassword(newPassword)) {
                     JOptionPane.showMessageDialog(resetDialog, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify valid email is sent (simulated)
                 boolean emailSent = simulateEmailSending(email);
                 if (!emailSent) {
                     JOptionPane.showMessageDialog(resetDialog, "Failed to send reset email. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Verify success message is displayed after successful attempt
                 JOptionPane.showMessageDialog(resetDialog, "Password reset successful! Check your email for confirmation.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 resetDialog.dispose();
             }
@@ -175,7 +180,7 @@ public class loginPage {
         resetDialog.add(submitButton);
 
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.setBounds(150, 220, 120, 25);
+        cancelButton.setBounds(230, 190, 80, 25);
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -189,7 +194,7 @@ public class loginPage {
 
     private static boolean simulateEmailSending(String email) {
         // Simulate email sending - in real implementation, this would connect to an email service
-        // For now, just return true to simulate successful email sending
+        System.out.println("Sending password reset email to: " + email);
         return true;
     }
 }

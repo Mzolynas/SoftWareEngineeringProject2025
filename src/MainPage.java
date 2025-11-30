@@ -13,7 +13,7 @@ public class MainPage {
     private static JLabel statsLabel;
 
     public static void createMainPage() {
-        frame = new JFrame("Shoe Inventory System");
+        frame = new JFrame("Shoe Inventory System - Admin Dashboard");
         frame.setSize(1200, 700);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -24,7 +24,7 @@ public class MainPage {
 
         // Title Panel
         JPanel titlePanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("Shoe Inventory Management System", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Admin - Shoe Inventory Management System", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(new Color(0, 51, 102));
         titlePanel.add(titleLabel, BorderLayout.NORTH);
@@ -124,6 +124,14 @@ public class MainPage {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {  // ID column
+                    return Integer.class;
+                }
+                return Object.class;
+            }
         };
         
         shoesTable = new JTable(tableModel);
@@ -169,7 +177,7 @@ public class MainPage {
         
         JScrollPane scrollPane = new JScrollPane(shoesTable);
         scrollPane.setPreferredSize(new Dimension(1100, 400));
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Shoe Inventory"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Shoe Inventory - Admin View"));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Button panel - ALL BUTTONS DARK BLUE
@@ -182,6 +190,7 @@ public class MainPage {
         JButton deleteBtn = createStyledButton("Delete Shoe", new Color(0, 51, 102));
         JButton viewDetailsBtn = createStyledButton("View Details", new Color(0, 51, 102));
         JButton statsBtn = createStyledButton("Inventory Stats", new Color(0, 51, 102));
+        JButton stockMonitorBtn = createStyledButton("Stock Monitor", new Color(0, 51, 102));
         JButton logoutBtn = createStyledButton("Logout", new Color(0, 51, 102));
         
         buttonPanel.add(refreshBtn);
@@ -190,6 +199,7 @@ public class MainPage {
         buttonPanel.add(deleteBtn);
         buttonPanel.add(viewDetailsBtn);
         buttonPanel.add(statsBtn);
+        buttonPanel.add(stockMonitorBtn);
         buttonPanel.add(logoutBtn);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -239,6 +249,7 @@ public class MainPage {
         deleteBtn.addActionListener(e -> deleteSelectedShoe());
         viewDetailsBtn.addActionListener(e -> showShoeDetails());
         statsBtn.addActionListener(e -> showInventoryStatistics());
+        stockMonitorBtn.addActionListener(e -> openStockMonitorPage());
         logoutBtn.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(frame, 
                 "Are you sure you want to logout?", 
@@ -433,7 +444,7 @@ public class MainPage {
 
     // ADD SHOE DIALOG
     private static void showAddShoeDialog() {
-        JDialog addDialog = new JDialog(frame, "Add New Shoe", true);
+        JDialog addDialog = new JDialog(frame, "Add New Shoe - Admin", true);
         addDialog.setSize(500, 600);
         addDialog.setLocationRelativeTo(frame);
         addDialog.setLayout(new GridLayout(0, 2, 10, 10));
@@ -585,7 +596,7 @@ public class MainPage {
             return;
         }
         
-        JDialog editDialog = new JDialog(frame, "Edit Shoe - " + currentShoe.getName(), true);
+        JDialog editDialog = new JDialog(frame, "Edit Shoe - Admin - " + currentShoe.getName(), true);
         editDialog.setSize(500, 600);
         editDialog.setLocationRelativeTo(frame);
         editDialog.setLayout(new GridLayout(0, 2, 10, 10));
@@ -674,6 +685,9 @@ public class MainPage {
             }
             
             try {
+                // Get the updated quantity from spinner
+                int updatedQuantity = (Integer) quantitySpinner.getValue();
+                
                 // Create updated shoe object
                 shoes updatedShoe = new shoes(
                     currentShoe.getId(),
@@ -682,7 +696,7 @@ public class MainPage {
                     (Double) sizeCombo.getSelectedItem(),
                     colorField.getText().trim(),
                     Double.parseDouble(priceField.getText().trim()),
-                    (Integer) quantitySpinner.getValue(),
+                    updatedQuantity, // Use the updated quantity
                     categoryCombo.getSelectedItem().toString(),
                     descriptionArea.getText().trim(),
                     currentShoe.getDateAdded()
@@ -698,6 +712,11 @@ public class MainPage {
                         JOptionPane.INFORMATION_MESSAGE);
                     editDialog.dispose();
                     loadShoesIntoTable();
+                    
+                    // Show low stock alert if quantity is now low
+                    if (updatedQuantity < 5) {
+                        PurchaseOrderService.showLowStockAlert(frame);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(editDialog, 
                         "Failed to update shoe. Please try again.", 
@@ -844,5 +863,236 @@ public class MainPage {
         JOptionPane.showMessageDialog(frame, scrollPane, 
             "Inventory Statistics", 
             JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // STOCK MONITORING FUNCTIONALITY
+    private static void openStockMonitorPage() {
+        JFrame stockFrame = new JFrame("Stock Monitoring & Purchase Orders - Admin");
+        stockFrame.setSize(900, 600);
+        stockFrame.setLocationRelativeTo(frame);
+        stockFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Title
+        JLabel titleLabel = new JLabel("Stock Monitoring & Purchase Order Management", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(0, 51, 102));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+        
+        // Tabbed pane for different views
+        JTabbedPane tabbedPane = new JTabbedPane();
+        
+        // Tab 1: Low Stock Alert
+        tabbedPane.addTab("Low Stock Alerts", createLowStockPanel());
+        
+        // Tab 2: Purchase Orders
+        tabbedPane.addTab("Purchase Orders", createPurchaseOrdersPanel());
+        
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+        
+        // Bottom buttons
+        JPanel bottomPanel = new JPanel(new FlowLayout());
+        JButton refreshBtn = createStyledButton("Refresh", new Color(0, 51, 102));
+        JButton closeBtn = createStyledButton("Close", new Color(0, 51, 102));
+        
+        refreshBtn.addActionListener(e -> {
+            tabbedPane.setComponentAt(0, createLowStockPanel());
+            tabbedPane.setComponentAt(1, createPurchaseOrdersPanel());
+            tabbedPane.setSelectedIndex(0);
+        });
+        
+        closeBtn.addActionListener(e -> stockFrame.dispose());
+        
+        bottomPanel.add(refreshBtn);
+        bottomPanel.add(closeBtn);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+        
+        stockFrame.add(mainPanel);
+        stockFrame.setVisible(true);
+    }
+
+    private static JPanel createLowStockPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Header with buttons
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel titleLabel = new JLabel("Low Stock Items (Quantity < 5)");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        
+        JButton generateOrdersBtn = createStyledButton("Generate Purchase Orders", new Color(0, 51, 102));
+        
+        headerPanel.add(titleLabel);
+        headerPanel.add(Box.createHorizontalStrut(20));
+        headerPanel.add(generateOrdersBtn);
+        
+        panel.add(headerPanel, BorderLayout.NORTH);
+        
+        // Low stock table
+        String[] columnNames = {"ID", "Name", "Brand", "Size", "Color", "Price", "Quantity", "Category"};
+        DefaultTableModel lowStockModel = new DefaultTableModel(columnNames, 0);
+        JTable lowStockTable = new JTable(lowStockModel);
+        
+        // Load low stock data
+        List<shoes> lowStockItems = PurchaseOrderService.getLowStockItems();
+        for (shoes shoe : lowStockItems) {
+            lowStockModel.addRow(new Object[]{
+                shoe.getId(),
+                shoe.getName(),
+                shoe.getBrand(),
+                shoe.getSize(),
+                shoe.getColor(),
+                String.format("$%.2f", shoe.getPrice()),
+                shoe.getQuantity(),
+                shoe.getCategory()
+            });
+        }
+        
+        JScrollPane scrollPane = new JScrollPane(lowStockTable);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Status label
+        JLabel statusLabel = new JLabel("Found " + lowStockItems.size() + " low stock items");
+        panel.add(statusLabel, BorderLayout.SOUTH);
+        
+        // Generate orders button action
+        generateOrdersBtn.addActionListener(e -> {
+            if (lowStockItems.isEmpty()) {
+                JOptionPane.showMessageDialog(panel, "No low stock items to generate orders for.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            
+            int confirm = JOptionPane.showConfirmDialog(panel,
+                "Generate purchase orders for " + lowStockItems.size() + " low stock items?",
+                "Confirm Purchase Orders",
+                JOptionPane.YES_NO_OPTION);
+                
+            if (confirm == JOptionPane.YES_OPTION) {
+                List<PurchaseOrder> newOrders = PurchaseOrderService.createOrdersForLowStock(lowStockItems);
+                JOptionPane.showMessageDialog(panel,
+                    "Generated " + newOrders.size() + " purchase orders successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+                    
+                // Refresh the low stock panel
+                ((JTabbedPane)panel.getParent().getParent()).setComponentAt(1, createPurchaseOrdersPanel());
+            }
+        });
+        
+        return panel;
+    }
+
+    private static JPanel createPurchaseOrdersPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Header
+        JLabel titleLabel = new JLabel("Purchase Orders");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        panel.add(titleLabel, BorderLayout.NORTH);
+        
+        // Purchase orders table
+        String[] columnNames = {"PO ID", "Model", "Quantity", "Status", "Update Status"};
+        DefaultTableModel poModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 4; // Only the action column is editable
+            }
+        };
+        
+        JTable poTable = new JTable(poModel);
+        
+        // Load purchase orders
+        List<PurchaseOrder> orders = PurchaseOrderService.getAllOrders();
+        for (PurchaseOrder order : orders) {
+            poModel.addRow(new Object[]{
+                order.getId(),
+                order.getModel(),
+                order.getQuantity(),
+                order.getStatus(),
+                "Update"
+            });
+        }
+        
+        // Add button renderer and editor for the action column
+        poTable.getColumn("Update Status").setCellRenderer(new ButtonRenderer());
+        poTable.getColumn("Update Status").setCellEditor(new ButtonEditor(new JCheckBox(), poTable));
+        
+        JScrollPane scrollPane = new JScrollPane(poTable);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Status label
+        JLabel statusLabel = new JLabel("Total purchase orders: " + orders.size());
+        panel.add(statusLabel, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+
+    // Button renderer and editor for the purchase orders table
+    static class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+        }
+        
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            setText((value == null) ? "" : value.toString());
+            return this;
+        }
+    }
+
+    static class ButtonEditor extends DefaultCellEditor {
+        private JButton button;
+        private String label;
+        private boolean isPushed;
+        private JTable table;
+        
+        public ButtonEditor(JCheckBox checkBox, JTable table) {
+            super(checkBox);
+            this.table = table;
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(e -> fireEditingStopped());
+        }
+        
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            label = (value == null) ? "" : value.toString();
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+        
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                int row = table.getEditingRow();
+                int poId = (Integer) table.getValueAt(row, 0);
+                String currentStatus = (String) table.getValueAt(row, 3);
+                
+                // Show status update dialog
+                String[] statusOptions = {"Pending", "Ordered", "Received", "Cancelled"};
+                String newStatus = (String) JOptionPane.showInputDialog(table,
+                    "Update status for PO #" + poId + ":",
+                    "Update Purchase Order Status",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    statusOptions,
+                    currentStatus);
+                    
+                if (newStatus != null && !newStatus.equals(currentStatus)) {
+                    boolean success = PurchaseOrderService.updateOrderStatus(poId, newStatus);
+                    if (success) {
+                        table.setValueAt(newStatus, row, 3);
+                        JOptionPane.showMessageDialog(table, "Status updated successfully!");
+                    } else {
+                        JOptionPane.showMessageDialog(table, "Failed to update status!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+            isPushed = false;
+            return label;
+        }
     }
 }

@@ -14,18 +14,15 @@ public class EnhancedShoeDataBase {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             
-            // First try to connect to the specific database
             System.out.println("🔗 Attempting to connect to: " + DB_URL);
             return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
             
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC Driver not found", e);
         } catch (SQLException e) {
-            // If database doesn't exist, create it
             if (e.getMessage().contains("Unknown database")) {
                 System.out.println("📦 Database doesn't exist. Creating it now...");
                 createDatabaseAndTables();
-                // Try connecting again
                 return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
             }
             throw e;
@@ -34,19 +31,16 @@ public class EnhancedShoeDataBase {
 
     private static void createDatabaseAndTables() {
         try {
-            // Connect without specifying database
             Connection conn = DriverManager.getConnection(BASE_URL, DB_USER, DB_PASSWORD);
             Statement stmt = conn.createStatement();
             
-            // Create database
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DB_NAME);
             System.out.println("✅ Database '" + DB_NAME + "' created successfully!");
             
-            // Switch to the new database
             stmt.executeUpdate("USE " + DB_NAME);
             
-            // Create table
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS shoes (" +
+            // Create shoes table
+            String createShoesTableSQL = "CREATE TABLE IF NOT EXISTS shoes (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "name VARCHAR(255) NOT NULL, " +
                     "brand VARCHAR(100) NOT NULL, " +
@@ -58,10 +52,20 @@ public class EnhancedShoeDataBase {
                     "description TEXT, " +
                     "date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
             
-            stmt.executeUpdate(createTableSQL);
+            stmt.executeUpdate(createShoesTableSQL);
             System.out.println("✅ Table 'shoes' created successfully!");
             
-            // Insert sample data
+            // Create purchase_order table
+            String createPurchaseOrderTableSQL = "CREATE TABLE IF NOT EXISTS purchase_order (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "model VARCHAR(255) NOT NULL, " +
+                    "quantity INT NOT NULL, " +
+                    "status VARCHAR(50) DEFAULT 'Pending', " +
+                    "created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+            
+            stmt.executeUpdate(createPurchaseOrderTableSQL);
+            System.out.println("✅ Table 'purchase_order' created successfully!");
+            
             insertSampleData(stmt);
             
             stmt.close();
