@@ -968,7 +968,6 @@ public class MainPage {
         JLabel statusLabel = new JLabel("Found " + lowStockItems.size() + " low stock items");
         panel.add(statusLabel, BorderLayout.SOUTH);
         
-        // Generate orders button action
         generateOrdersBtn.addActionListener(e -> {
             if (lowStockItems.isEmpty()) {
                 JOptionPane.showMessageDialog(panel, "No low stock items to generate orders for.", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -986,11 +985,16 @@ public class MainPage {
                     "Generated " + newOrders.size() + " purchase orders successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
-                    
-                // Refresh the low stock panel
-                ((JTabbedPane)panel.getParent().getParent()).setComponentAt(1, createPurchaseOrdersPanel());
+
+                JTabbedPane tabs = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, panel);
+                if (tabs != null) {
+                    tabs.setComponentAt(1, createPurchaseOrdersPanel());
+                } else {
+                    System.err.println("ERROR: Could not find JTabbedPane ancestor!");
+                }
             }
         });
+
         
         return panel;
     }
