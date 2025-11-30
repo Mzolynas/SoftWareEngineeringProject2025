@@ -18,7 +18,7 @@ public class loginPage {
 
         JComboBox<String> loginType = new JComboBox<>();
         loginType.setBounds(150, 30, 165, 25);
-        loginType.addItem("Customer");
+        loginType.addItem("Employee");
         loginType.addItem("Admin");
         panel.add(loginType);
 
@@ -62,18 +62,24 @@ public class loginPage {
                 }
                 return;
             }
+            else if (userType.equals("Employee")) {
 
-            // Authenticate valid email and pass, show message if invalid and prompt for new entry
-            // show successful login message if valid and redirect to main page
-            if (!AuthService.isValidEmail(username)) {
-                JOptionPane.showMessageDialog(frame, "Invalid email format! Must be xxxx@xxx.xx", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+                if (!AuthService.isValidEmail(username)) {
+                    JOptionPane.showMessageDialog(frame, "Invalid email format! Must be xxxx@xxx.xx", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (!AuthService.isValidPassword(password)) {
+                    JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                JOptionPane.showMessageDialog(frame, "Employee Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
+                EmployeePage.createEmployeePage();
+                return; // STOP here
             }
 
-            if (!AuthService.isValidPassword(password)) {
-                JOptionPane.showMessageDialog(frame, "Password must be at least 8 characters and contain 1 special character!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
 
             JOptionPane.showMessageDialog(frame, "Customer Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
             frame.dispose();
