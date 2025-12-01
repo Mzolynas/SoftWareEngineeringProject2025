@@ -16,7 +16,11 @@
 	</natures>
 	<filteredResources>
 		<filter>
+<<<<<<< HEAD
 			<id>1763590413804</id>
+=======
+			<id>1764459958838</id>
+>>>>>>> refs/heads/feature/loginPage&DataBase
 			<name></name>
 			<type>30</type>
 			<matcher>
